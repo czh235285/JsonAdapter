@@ -46,6 +46,15 @@ class TestAdapter(mLayoutResId: Int, mData: JSONArray?) : JsonAdapter(mLayoutRes
 
 ```
 
+item点击事件
+
+```
+
+   adapter.setOnItemClickListener { adapter, view, position ->
+            TODO()
+        }
+
+```
 
 刷新数据/加载更多 :
 
