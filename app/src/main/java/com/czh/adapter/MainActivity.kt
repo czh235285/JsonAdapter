@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_main.*
+import org.json.JSONArray
 import org.json.JSONObject
 
 class MainActivity : AppCompatActivity() {
@@ -30,5 +31,6 @@ class MainActivity : AppCompatActivity() {
         val adapter = TestAdapter(R.layout.item, a)
         adapter.setEmptyView(layoutInflater.inflate(R.layout.empty,null))
         rcv.adapter = adapter
+
     }
 }

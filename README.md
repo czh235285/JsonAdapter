@@ -21,16 +21,38 @@ dependencies {
   implementation 'com.github.czh235285:JsonAdapter:1.0.0'
 }
 ```
-## 使用代码
+## 介绍
+
+使用代码 :
 
 ```
 
 class TestAdapter(mLayoutResId: Int, mData: JSONArray?) : JsonAdapter(mLayoutResId, mData) {
     override fun convert(holder: BaseViewHolder, item: JSONObject?) {
         holder.itemView.run {
-            item?.getString("name")?.let { tvName.text = it }
+            item?.optString("name")?.let { tvName.text = it }
         }
     }
 }
+
+```
+
+支持空布局 :
+添加头部、尾部暂时未写。
+
+```
+
+   adapter.setEmptyView(layoutInflater.inflate(R.layout.empty,null))
+
+```
+
+
+刷新数据/加载更多 :
+
+
+```
+
+    adapter.replaceData(JSONArray)
+    adapter.addData(JSONArray)
 
 ```

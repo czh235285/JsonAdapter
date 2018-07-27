@@ -134,7 +134,7 @@ public abstract class JsonAdapter extends RecyclerView.Adapter<BaseViewHolder> {
     /**
      * 刷新数据
      */
-    void replaceData(JSONArray data) {
+    public void replaceData(JSONArray data) {
         // 不是同一个引用才清空列表
         if (data != mData) {
             mData = data == null ? new JSONArray() : data;
@@ -146,7 +146,7 @@ public abstract class JsonAdapter extends RecyclerView.Adapter<BaseViewHolder> {
     /**
      * 加载更多
      */
-    void addData(JSONArray data) throws JSONException {
+    public void addData(JSONArray data) throws JSONException {
         for (int i = 0; i < data.length(); i++) {
             mData.put(mData.length(), data.optJSONObject(i));
         }
