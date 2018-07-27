@@ -37,8 +37,7 @@ class TestAdapter(mLayoutResId: Int, mData: JSONArray?) : JsonAdapter(mLayoutRes
 
 ```
 
-支持空布局 :
-添加头部、尾部暂时未写。
+支持空布局（添加头部、尾部未写，有需要的Issues） :
 
 ```
 
