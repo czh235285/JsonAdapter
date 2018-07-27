@@ -7,7 +7,7 @@
 * 仅适用kotlin开发者
 * 仅适用kotlin开发者
 * 仅适用kotlin开发者
-* 重要事情说三遍，只是用于自己开发，所以ViewHolder并没有进行任何封装。kotlin可以直接用xml中的id，所以我也没继续封装。。。懒癌晚期
+* 重要事情说三遍，只是用于自己开发，kotlin可以直接用xml中的id，所以ViewHolder我也没继续封装。。。懒癌晚期
 
 use Gradle:
 
