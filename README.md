@@ -18,7 +18,7 @@ repositories {
   google()
 }
 dependencies {
-  implementation 'com.github.czh235285:JsonAdapter:1.0.0'
+  implementation 'com.github.czh235285:JsonAdapter:1.0.1'
 }
 ```
 ## 介绍
