@@ -4,10 +4,10 @@
 减少Bean类文件，如果遇到经常修改字段的后台，用这个就不用到处改了。
 复杂页面，经常修改数据的时候，JsonArray不方便修改，就不要使用这个了。
 
-* 仅适用kotlin开发者
-* 仅适用kotlin开发者
-* 仅适用kotlin开发者
-* 重要事情说三遍，只是用于自己开发，kotlin可以直接用xml中的id，所以ViewHolder我也没继续封装。。。懒癌晚期
+* 适用kotlin开发者
+* 适用kotlin开发者
+* 适用kotlin开发者
+* 重要事情说三遍，只是用于自己开发，kotlin可以直接用xml中的id，所以ViewHolder我也没继续封装。。。懒癌晚期，java使用就需要自己findViewById，有点麻烦咯。
 
 use Gradle:
 
