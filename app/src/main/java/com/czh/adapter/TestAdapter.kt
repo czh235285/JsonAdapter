@@ -8,10 +8,9 @@ import czh.library.JsonAdapter
 import kotlinx.android.synthetic.main.item.view.*
 
 class TestAdapter(mLayoutResId: Int, mData: JSONArray?) : JsonAdapter(mLayoutResId, mData) {
-
     override fun convert(holder: BaseViewHolder, item: JSONObject?) {
         holder.itemView.run {
-            item?.getString("name")?.let { name.text = it }
+            item?.getString("name")?.let { tvName.text = it }
         }
     }
 }
