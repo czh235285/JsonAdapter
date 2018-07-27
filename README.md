@@ -21,7 +21,7 @@ dependencies {
   implementation 'com.github.czh235285:JsonAdapter:1.0.0'
 }
 ```
-## 举个栗子
+## 使用代码
 
 ```
 
