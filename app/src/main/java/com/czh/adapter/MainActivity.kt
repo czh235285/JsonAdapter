@@ -15,11 +15,11 @@ class MainActivity : AppCompatActivity() {
 {
   "a":[
     {
-      "name" : "张三",
+      "name" : "张三"
     },{
-      "name" : "李四",
+      "name" : "李四"
     },{
-      "name" : "王麻子",
+      "name" : "王麻子"
     }
     ]
 }
