@@ -22,7 +22,7 @@ repositories {
   google()
 }
 dependencies {
-  implementation 'com.github.czh235285:JsonAdapter:1.0.2'
+  implementation 'com.github.czh235285:JsonAdapter:1.0.3'
 }
 ```
 ## 用法介绍

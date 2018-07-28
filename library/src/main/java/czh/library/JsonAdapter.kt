@@ -244,6 +244,68 @@ abstract class JsonAdapter(private var mLayoutResId: Int, data: JSONArray?) : Re
 
 
     /**
+     * 移除 header
+     * @param header
+     */
+    fun removeHeaderView(header: View) {
+        if (getHeaderLayoutCount() == 0) return
+
+        mHeaderLayout?.removeView(header)
+        if (mHeaderLayout?.childCount == 0) {
+            val position = getHeaderViewPosition()
+            if (position != -1) {
+                notifyItemRemoved(position)
+            }
+        }
+    }
+
+
+
+    /**
+     * 移除 footer
+     * @param footer
+     */
+    fun removeFooterView(footer: View) {
+        if (getFooterLayoutCount() == 0) return
+
+        mFooterLayout?.removeView(footer)
+        if (mFooterLayout?.childCount == 0) {
+            val position = getFooterViewPosition()
+            if (position != -1) {
+                notifyItemRemoved(position)
+            }
+        }
+    }
+
+
+    /**
+     * 移除 所有HeaderView
+     */
+    fun removeAllHeaderView() {
+        if (getHeaderLayoutCount() == 0) return
+
+        mHeaderLayout?.removeAllViews()
+        val position = getHeaderViewPosition()
+        if (position != -1) {
+            notifyItemRemoved(position)
+        }
+    }
+
+    /**
+     * 移除 所有FooterView
+     */
+    fun removeAllFooterView() {
+        if (getFooterLayoutCount() == 0) return
+
+        mFooterLayout?.removeAllViews()
+        val position = getFooterViewPosition()
+        if (position != -1) {
+            notifyItemRemoved(position)
+        }
+    }
+
+
+    /**
      * 刷新数据
      */
     fun replaceData(data: JSONArray?) {
