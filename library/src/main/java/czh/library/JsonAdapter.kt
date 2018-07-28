@@ -10,7 +10,6 @@ import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.FrameLayout
 import android.widget.LinearLayout
-import com.chad.library.adapter.base.BaseQuickAdapter
 
 import org.json.JSONArray
 import org.json.JSONException
