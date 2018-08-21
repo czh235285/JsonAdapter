@@ -1,4 +1,6 @@
 ## JsonAdapter
+[![](https://jitpack.io/v/czh235285/JsonAdapter.svg)](https://jitpack.io/#czh235285/JsonAdapter)
+
 
 
 简单页面adapter封装，直接传入JsonArray。
