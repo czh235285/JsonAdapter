@@ -1,10 +1,10 @@
 package com.czh.adapter
 
+import czh.adapter.BaseViewHolder
+import czh.adapter.JsonAdapter
 import org.json.JSONArray
 import org.json.JSONObject
 
-import czh.library.BaseViewHolder
-import czh.library.JsonAdapter
 import kotlinx.android.synthetic.main.item.view.*
 
 class TestAdapter(mLayoutResId: Int, mData: JSONArray?) : JsonAdapter(mLayoutResId, mData) {

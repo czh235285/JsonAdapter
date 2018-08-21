@@ -1,4 +1,4 @@
-package czh.library
+package czh.adapter
 
 import android.content.Context
 import android.support.annotation.IntRange
@@ -10,22 +10,20 @@ import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.FrameLayout
 import android.widget.LinearLayout
-
-import org.json.JSONArray
-import org.json.JSONException
-import org.json.JSONObject
+import org.jetbrains.anko.AnkoComponent
+import org.jetbrains.anko.AnkoContext
 
 /**
  * https://github.com/czh235285/JsonAdapter
  */
-abstract class JsonAdapter(private var mLayoutResId: Int, data: JSONArray?) : RecyclerView.Adapter<BaseViewHolder>() {
-    var mData: JSONArray
+abstract class AnkoAdapter<T : AnkoComponent<Context>, E>(val ui: T, data: List<E>?) : RecyclerView.Adapter<BaseViewHolder>() {
+    var mData: MutableList<E>
 
     protected lateinit var mContext: Context
     private lateinit var mLayoutInflater: LayoutInflater
 
-    private var onItemClickListener: OnItemClickListener? = null
-    private var onItemLongClickListener: OnItemLongClickListener? = null
+    private var onItemClickListener: OnItemClickListener<E>? = null
+    private var onItemLongClickListener: OnItemLongClickListener<E>? = null
 
     //header footer
     private var mHeaderLayout: LinearLayout? = null
@@ -44,7 +42,7 @@ abstract class JsonAdapter(private var mLayoutResId: Int, data: JSONArray?) : Re
     }
 
     private fun getEmptyViewCount(): Int = when {
-        mEmptyLayout == null || mEmptyLayout!!.childCount == 0 || !mIsUseEmpty || mData.length() != 0 -> 0
+        mEmptyLayout == null || mEmptyLayout!!.childCount == 0 || !mIsUseEmpty || mData.size != 0 -> 0
         else -> 1
     }
 
@@ -74,14 +72,14 @@ abstract class JsonAdapter(private var mLayoutResId: Int, data: JSONArray?) : Re
                 return position
             }
         } else {
-            return getHeaderLayoutCount() + mData.length()
+            return getHeaderLayoutCount() + mData.size
         }
         return -1
     }
 
 
     init {
-        this.mData = data ?: JSONArray()
+        this.mData = data?.toMutableList() ?: arrayListOf()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
@@ -92,7 +90,7 @@ abstract class JsonAdapter(private var mLayoutResId: Int, data: JSONArray?) : Re
             HEADER_VIEW -> BaseViewHolder(mHeaderLayout!!)
             FOOTER_VIEW -> BaseViewHolder(mFooterLayout!!)
             else -> {
-                BaseViewHolder(mLayoutInflater.inflate(mLayoutResId, parent, false)).apply {
+                BaseViewHolder(ui.createView(AnkoContext.create(mContext))).apply {
                     itemView?.setOnClickListener {
                         onItemClickListener?.onItemClick(it, layoutPosition - getHeaderLayoutCount(), getItem(layoutPosition - getHeaderLayoutCount())!!)
                     }
@@ -107,18 +105,17 @@ abstract class JsonAdapter(private var mLayoutResId: Int, data: JSONArray?) : Re
 
     }
 
-
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         when (holder.itemViewType) {
             HEADER_VIEW, FOOTER_VIEW, EMPTY_VIEW -> {
             }
-            else -> convert(holder, getItem(position - getHeaderLayoutCount()))
+            else -> convert(holder, ui, getItem(position - getHeaderLayoutCount()))
         }
     }
 
-    private fun getItem(@IntRange(from = 0) position: Int): JSONObject? {
-        return if (position < mData.length())
-            mData.optJSONObject(position)
+    private fun getItem(@IntRange(from = 0) position: Int): E? {
+        return if (position < mData.size)
+            mData[position]
         else
             null
     }
@@ -134,7 +131,7 @@ abstract class JsonAdapter(private var mLayoutResId: Int, data: JSONArray?) : Re
                 count++
             }
         } else {
-            count = getHeaderLayoutCount() + mData.length() + getFooterLayoutCount()
+            count = getHeaderLayoutCount() + mData.size + getFooterLayoutCount()
         }
         return count
     }
@@ -160,7 +157,7 @@ abstract class JsonAdapter(private var mLayoutResId: Int, data: JSONArray?) : Re
         }
         return when {
             position < getHeaderLayoutCount() -> HEADER_VIEW
-            position - getHeaderLayoutCount() < mData.length() -> super.getItemViewType(position)
+            position - getHeaderLayoutCount() < mData.size -> super.getItemViewType(position)
             else -> FOOTER_VIEW
         }
 
@@ -306,10 +303,10 @@ abstract class JsonAdapter(private var mLayoutResId: Int, data: JSONArray?) : Re
     /**
      * 刷新数据
      */
-    fun replaceData(data: JSONArray?) {
+    fun replaceData(data: List<E>?) {
         // 不是同一个引用才清空列表
         if (data !== mData) {
-            mData = data ?: JSONArray()
+            mData = data?.toMutableList() ?: arrayListOf()
         }
         notifyDataSetChanged()
     }
@@ -318,47 +315,46 @@ abstract class JsonAdapter(private var mLayoutResId: Int, data: JSONArray?) : Re
     /**
      * 加载更多
      */
-    @Throws(JSONException::class)
-    fun addData(data: JSONArray) {
-        for (i in 0 until data.length()) {
-            mData.put(mData.length(), data.optJSONObject(i))
+    fun addData(data: List<E>?) {
+        data?.let {
+            mData.addAll(it)
+            notifyDataSetChanged()
         }
-        notifyDataSetChanged()
     }
 
     /**
      * item点击事件监听
      */
-    interface OnItemClickListener {
-        fun onItemClick(view: View, position: Int, item: JSONObject)
+    interface OnItemClickListener<E> {
+        fun onItemClick(view: View, position: Int, item: E)
     }
 
     /**
      * item长按事件监听
      */
-    interface OnItemLongClickListener {
-        fun onItemLongClick(view: View, position: Int, item: JSONObject): Boolean
+    interface OnItemLongClickListener<E> {
+        fun onItemLongClick(view: View, position: Int, item: E): Boolean
     }
 
 
-    fun setOnItemClickListener(action: (view: View, position: Int, item: JSONObject) -> Unit) {
-        onItemClickListener = object : OnItemClickListener {
-            override fun onItemClick(view: View, position: Int, item: JSONObject) {
+    fun setOnItemClickListener(action: (view: View, position: Int, item: E) -> Unit) {
+        onItemClickListener = object : OnItemClickListener<E> {
+            override fun onItemClick(view: View, position: Int, item: E) {
                 action(view, position, item)
             }
         }
     }
 
-    fun setOnItemLongClickListener(action: (view: View, position: Int, item: JSONObject) -> Unit) {
-        onItemLongClickListener = object : OnItemLongClickListener {
-            override fun onItemLongClick(view: View, position: Int, item: JSONObject): Boolean {
+    fun setOnItemLongClickListener(action: (view: View, position: Int, item: E) -> Unit) {
+        onItemLongClickListener = object : OnItemLongClickListener<E> {
+            override fun onItemLongClick(view: View, position: Int, item: E): Boolean {
                 action(view, position, item)
                 return true
             }
         }
     }
 
-    protected abstract fun convert(holder: BaseViewHolder, item: JSONObject?)
+    protected abstract fun convert(holder: BaseViewHolder, ui: T, item: E?)
 
     companion object {
         const val EMPTY_VIEW = 0x00000111
