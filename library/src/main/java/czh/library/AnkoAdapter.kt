@@ -11,18 +11,19 @@ import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import org.jetbrains.anko.AnkoComponent
+import org.jetbrains.anko.AnkoContext
 
 /**
  * https://github.com/czh235285/JsonAdapter
  */
-abstract class SimpleAnkoAdapter<T>(data: List<T>?) : RecyclerView.Adapter<BaseViewHolder>() {
-    var mData: MutableList<T>
+abstract class AnkoAdapter<T : AnkoComponent<Context>, E>(val ui: T, data: List<E>?) : RecyclerView.Adapter<BaseViewHolder>() {
+    var mData: MutableList<E>
 
     protected lateinit var mContext: Context
     private lateinit var mLayoutInflater: LayoutInflater
 
-    private var onItemClickListener: OnItemClickListener<T>? = null
-    private var onItemLongClickListener: OnItemLongClickListener<T>? = null
+    private var onItemClickListener: OnItemClickListener<E>? = null
+    private var onItemLongClickListener: OnItemLongClickListener<E>? = null
 
     //header footer
     private var mHeaderLayout: LinearLayout? = null
@@ -81,7 +82,6 @@ abstract class SimpleAnkoAdapter<T>(data: List<T>?) : RecyclerView.Adapter<BaseV
         this.mData = data?.toMutableList() ?: arrayListOf()
     }
 
-    abstract fun ankoLayout(): View
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         this.mContext = parent.context
         this.mLayoutInflater = LayoutInflater.from(mContext)
@@ -90,7 +90,7 @@ abstract class SimpleAnkoAdapter<T>(data: List<T>?) : RecyclerView.Adapter<BaseV
             HEADER_VIEW -> BaseViewHolder(mHeaderLayout!!)
             FOOTER_VIEW -> BaseViewHolder(mFooterLayout!!)
             else -> {
-                BaseViewHolder(ankoLayout()).apply {
+                BaseViewHolder(ui.createView(AnkoContext.create(mContext))).apply {
                     itemView?.setOnClickListener {
                         onItemClickListener?.onItemClick(it, layoutPosition - getHeaderLayoutCount(), getItem(layoutPosition - getHeaderLayoutCount())!!)
                     }
@@ -104,15 +104,16 @@ abstract class SimpleAnkoAdapter<T>(data: List<T>?) : RecyclerView.Adapter<BaseV
         }
 
     }
+
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         when (holder.itemViewType) {
             HEADER_VIEW, FOOTER_VIEW, EMPTY_VIEW -> {
             }
-            else -> convert(holder, getItem(position - getHeaderLayoutCount()))
+            else -> convert(holder, ui, getItem(position - getHeaderLayoutCount()))
         }
     }
 
-    private fun getItem(@IntRange(from = 0) position: Int): T? {
+    private fun getItem(@IntRange(from = 0) position: Int): E? {
         return if (position < mData.size)
             mData[position]
         else
@@ -165,7 +166,8 @@ abstract class SimpleAnkoAdapter<T>(data: List<T>?) : RecyclerView.Adapter<BaseV
     /**
      * @param emptyView
      */
-    fun setEmptyView(emptyView: View) {
+    fun setEmptyView(emptyViewUI: AnkoComponent<Context>) {
+        val emptyView = emptyViewUI.createView(AnkoContext.create(mContext))
         var insert = false
         if (mEmptyLayout == null) {
             mEmptyLayout = FrameLayout(emptyView.context)
@@ -193,7 +195,8 @@ abstract class SimpleAnkoAdapter<T>(data: List<T>?) : RecyclerView.Adapter<BaseV
      * @param header
      * @param orientation
      */
-    fun addHeaderView(header: View, orientation: Int = LinearLayout.VERTICAL): Int {
+    fun addHeaderView(headerUI: AnkoComponent<Context>, orientation: Int = LinearLayout.VERTICAL): Int {
+        val header = headerUI.createView(AnkoContext.create(mContext))
         if (mHeaderLayout == null) {
             mHeaderLayout = LinearLayout(header.context)
             if (orientation == LinearLayout.VERTICAL) {
@@ -302,7 +305,7 @@ abstract class SimpleAnkoAdapter<T>(data: List<T>?) : RecyclerView.Adapter<BaseV
     /**
      * 刷新数据
      */
-    fun replaceData(data: List<T>?) {
+    fun replaceData(data: List<E>?) {
         // 不是同一个引用才清空列表
         if (data !== mData) {
             mData = data?.toMutableList() ?: arrayListOf()
@@ -314,7 +317,7 @@ abstract class SimpleAnkoAdapter<T>(data: List<T>?) : RecyclerView.Adapter<BaseV
     /**
      * 加载更多
      */
-    fun addData(data: List<T>?) {
+    fun addData(data: List<E>?) {
         data?.let {
             mData.addAll(it)
             notifyDataSetChanged()
@@ -324,36 +327,36 @@ abstract class SimpleAnkoAdapter<T>(data: List<T>?) : RecyclerView.Adapter<BaseV
     /**
      * item点击事件监听
      */
-    interface OnItemClickListener<T> {
-        fun onItemClick(view: View, position: Int, item: T)
+    interface OnItemClickListener<E> {
+        fun onItemClick(view: View, position: Int, item: E)
     }
 
     /**
      * item长按事件监听
      */
-    interface OnItemLongClickListener<T> {
-        fun onItemLongClick(view: View, position: Int, item: T): Boolean
+    interface OnItemLongClickListener<E> {
+        fun onItemLongClick(view: View, position: Int, item: E): Boolean
     }
 
 
-    fun setOnItemClickListener(action: (view: View, position: Int, item: T) -> Unit) {
-        onItemClickListener = object : OnItemClickListener<T> {
-            override fun onItemClick(view: View, position: Int, item: T) {
+    fun setOnItemClickListener(action: (view: View, position: Int, item: E) -> Unit) {
+        onItemClickListener = object : OnItemClickListener<E> {
+            override fun onItemClick(view: View, position: Int, item: E) {
                 action(view, position, item)
             }
         }
     }
 
-    fun setOnItemLongClickListener(action: (view: View, position: Int, item: T) -> Unit) {
-        onItemLongClickListener = object : OnItemLongClickListener<T> {
-            override fun onItemLongClick(view: View, position: Int, item: T): Boolean {
+    fun setOnItemLongClickListener(action: (view: View, position: Int, item: E) -> Unit) {
+        onItemLongClickListener = object : OnItemLongClickListener<E> {
+            override fun onItemLongClick(view: View, position: Int, item: E): Boolean {
                 action(view, position, item)
                 return true
             }
         }
     }
 
-    protected abstract fun convert(holder: BaseViewHolder, item: T?)
+    protected abstract fun convert(holder: BaseViewHolder, ui: T, item: E?)
 
     companion object {
         const val EMPTY_VIEW = 0x00000111

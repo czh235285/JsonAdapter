@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
 
 
         rcv.layoutManager = LinearLayoutManager(this)
-        rcv.adapter = DemoAdapter(arrayListOf("1", "2", "3"))
+        rcv.adapter = DemoAdapter(DemoAdapterUI(),arrayListOf("1", "2", "3"))
 //        rcv.layoutManager = LinearLayoutManager(this)
 //        val a = JSONObject(s).getJSONArray("a")
 //        val adapter = TestAdapter(R.layout.item, a)
