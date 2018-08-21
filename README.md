@@ -23,7 +23,12 @@ repositories {
   google()
 }
 dependencies {
-  implementation 'com.github.czh235285:JsonAdapter:1.0.4'
+
+  // 只是要JsonAdapter只需要这个版本就行了。
+  implementation 'com.github.czh235285:JsonAdapter:1.0.3'
+  
+  // 最新1.0.5加入了anko的adapter，用不上DSL布局就不要导入这个。
+  implementation 'com.github.czh235285:JsonAdapter:1.0.5'
 }
 ```
 ## 用法介绍
