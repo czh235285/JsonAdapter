@@ -166,8 +166,7 @@ abstract class AnkoAdapter<T : AnkoComponent<Context>, E>(val ui: T, data: List<
     /**
      * @param emptyView
      */
-    fun setEmptyView(emptyViewUI: AnkoComponent<Context>) {
-        val emptyView = emptyViewUI.createView(AnkoContext.create(mContext))
+    fun setEmptyView(emptyView: View) {
         var insert = false
         if (mEmptyLayout == null) {
             mEmptyLayout = FrameLayout(emptyView.context)
@@ -195,8 +194,7 @@ abstract class AnkoAdapter<T : AnkoComponent<Context>, E>(val ui: T, data: List<
      * @param header
      * @param orientation
      */
-    fun addHeaderView(headerUI: AnkoComponent<Context>, orientation: Int = LinearLayout.VERTICAL): Int {
-        val header = headerUI.createView(AnkoContext.create(mContext))
+    fun addHeaderView(header: View, orientation: Int = LinearLayout.VERTICAL): Int {
         if (mHeaderLayout == null) {
             mHeaderLayout = LinearLayout(header.context)
             if (orientation == LinearLayout.VERTICAL) {
