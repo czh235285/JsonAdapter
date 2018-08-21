@@ -28,7 +28,7 @@ dependencies {
   implementation 'com.github.czh235285:JsonAdapter:1.0.3'
   
   // 最新1.0.5加入了anko的adapter，用不上DSL布局就不要导入这个。
-  implementation 'com.github.czh235285:JsonAdapter:1.0.7'
+  implementation 'com.github.czh235285:JsonAdapter:1.0.8'
 }
 ```
 ## 用法介绍
