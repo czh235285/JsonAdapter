@@ -16,8 +16,11 @@ import org.jetbrains.anko.AnkoContext
 /**
  * https://github.com/czh235285/JsonAdapter
  */
-abstract class AnkoAdapter<T : AnkoComponent<Context>, E>(val ui: T, data: List<E>?) : RecyclerView.Adapter<BaseViewHolder>() {
-    var mData: MutableList<E>
+abstract class AnkoAdapter<E> : RecyclerView.Adapter<BaseViewHolder> {
+
+    var ui: AnkoComponent<Context>? = null
+    var mData: List<E>
+
 
     protected lateinit var mContext: Context
     private lateinit var mLayoutInflater: LayoutInflater
@@ -33,22 +36,32 @@ abstract class AnkoAdapter<T : AnkoComponent<Context>, E>(val ui: T, data: List<
     private var mEmptyLayout: FrameLayout? = null
     private var mIsUseEmpty = true
 
-    private var mHeadAndEmptyEnable: Boolean = false
+    var mHeadAndEmptyEnable: Boolean = false
     private var mFootAndEmptyEnable: Boolean = false
+
+    constructor(mData: List<E>?) : super() {
+        this.mData = mData?.toMutableList() ?: arrayListOf()
+    }
+
+    constructor(ui: AnkoComponent<Context>?, mData: List<E>?) : super() {
+        this.ui = ui
+        this.mData = mData?.toMutableList() ?: arrayListOf()
+    }
+
 
     fun setHeaderFooterEmpty(isHeadAndEmpty: Boolean, isFootAndEmpty: Boolean) {
         mHeadAndEmptyEnable = isHeadAndEmpty
         mFootAndEmptyEnable = isFootAndEmpty
     }
 
-    private fun getEmptyViewCount(): Int = when {
+    fun getEmptyViewCount(): Int = when {
         mEmptyLayout == null || mEmptyLayout!!.childCount == 0 || !mIsUseEmpty || mData.size != 0 -> 0
         else -> 1
     }
 
-    private fun getHeaderLayoutCount(): Int = if (mHeaderLayout == null || mHeaderLayout?.childCount == 0) 0 else 1
+     fun getHeaderLayoutCount(): Int = if (mHeaderLayout == null || mHeaderLayout?.childCount == 0) 0 else 1
 
-    private fun getFooterLayoutCount(): Int = if (mFooterLayout == null || mFooterLayout?.childCount == 0) 0 else 1
+    fun getFooterLayoutCount(): Int = if (mFooterLayout == null || mFooterLayout?.childCount == 0) 0 else 1
 
 
     private fun getHeaderViewPosition(): Int {
@@ -78,10 +91,6 @@ abstract class AnkoAdapter<T : AnkoComponent<Context>, E>(val ui: T, data: List<
     }
 
 
-    init {
-        this.mData = data?.toMutableList() ?: arrayListOf()
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         this.mContext = parent.context
         this.mLayoutInflater = LayoutInflater.from(mContext)
@@ -90,31 +99,35 @@ abstract class AnkoAdapter<T : AnkoComponent<Context>, E>(val ui: T, data: List<
             HEADER_VIEW -> BaseViewHolder(mHeaderLayout!!)
             FOOTER_VIEW -> BaseViewHolder(mFooterLayout!!)
             else -> {
-                BaseViewHolder(ui.createView(AnkoContext.create(mContext))).apply {
-                    itemView?.setOnClickListener {
-                        onItemClickListener?.onItemClick(it, layoutPosition - getHeaderLayoutCount(), getItem(layoutPosition - getHeaderLayoutCount())!!)
-                    }
-
-                    itemView?.setOnLongClickListener {
-                        onItemLongClickListener?.onItemLongClick(it, layoutPosition - getHeaderLayoutCount(), getItem(layoutPosition - getHeaderLayoutCount())!!)
-                        return@setOnLongClickListener true
-                    }
-                }
+                baseViewHolder(ui, mContext)
             }
         }
 
+    }
+
+    fun baseViewHolder(ui: AnkoComponent<Context>?, context: Context): BaseViewHolder {
+        return BaseViewHolder(ui!!.createView(AnkoContext.create(context))).apply {
+            itemView?.setOnClickListener {
+                onItemClickListener?.onItemClick(it, layoutPosition - getHeaderLayoutCount(), getItem(layoutPosition - getHeaderLayoutCount())!!)
+            }
+
+            itemView?.setOnLongClickListener {
+                onItemLongClickListener?.onItemLongClick(it, layoutPosition - getHeaderLayoutCount(), getItem(layoutPosition - getHeaderLayoutCount())!!)
+                return@setOnLongClickListener true
+            }
+        }
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         when (holder.itemViewType) {
             HEADER_VIEW, FOOTER_VIEW, EMPTY_VIEW -> {
             }
-            else -> convert(holder, ui, getItem(position - getHeaderLayoutCount()))
+            else -> convert(holder, ui!!,getItem(position - getHeaderLayoutCount()))
         }
     }
 
-    private fun getItem(@IntRange(from = 0) position: Int): E? {
-        return if (position < mData.size)
+    fun getItem(@IntRange(from = 0) position: Int): E? {
+        return if (position < mData.size && position >= 0)
             mData[position]
         else
             null
@@ -162,6 +175,7 @@ abstract class AnkoAdapter<T : AnkoComponent<Context>, E>(val ui: T, data: List<
         }
 
     }
+
 
     /**
      * @param emptyView
@@ -317,7 +331,7 @@ abstract class AnkoAdapter<T : AnkoComponent<Context>, E>(val ui: T, data: List<
      */
     fun addData(data: List<E>?) {
         data?.let {
-            mData.addAll(it)
+            mData.toMutableList().addAll(it)
             notifyDataSetChanged()
         }
     }
@@ -354,7 +368,7 @@ abstract class AnkoAdapter<T : AnkoComponent<Context>, E>(val ui: T, data: List<
         }
     }
 
-    protected abstract fun convert(holder: BaseViewHolder, ui: T, item: E?)
+    protected abstract fun convert(holder: BaseViewHolder, ui:AnkoComponent<Context>,item: E?)
 
     companion object {
         const val EMPTY_VIEW = 0x00000111
