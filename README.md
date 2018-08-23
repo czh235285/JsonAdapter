@@ -1,4 +1,6 @@
 ## JsonAdapter
+[![](https://jitpack.io/v/czh235285/JsonAdapter.svg)](https://jitpack.io/#czh235285/JsonAdapter)
+
 
 * 可以直接传入JsonArray的adapter精简封装，占用体积小
 * 简单页面，不想写bean类的时候，直接传入JsonArray。
@@ -14,7 +16,7 @@ repositories {
   google()
 }
 dependencies {
-  implementation 'com.github.czh235285:JsonAdapter:1.0.3'
+ implementation 'com.github.czh235285:JsonAdapter:1.2.0'
 }
 ```
 ## 用法介绍
